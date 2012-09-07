@@ -67,6 +67,8 @@
 }
 
 - (CGRect)calculateFrameForEntryElement {
+
+    
     int extra = (self.textField.clearButtonMode == UITextFieldViewModeNever) ? 15 :10;
     if (_entryElement.title == NULL && _entryElement.image==NULL) {
         return CGRectMake(10,10,self.contentView.frame.size.width-10-extra, self.frame.size.height-20);
@@ -89,9 +91,14 @@
                     titleWidth = width;
             }
         }
+        
+        if(titleWidth == 0) {
+            titleWidth = totalWidth*0.6;
+        }
+        
         _entryElement.parentSection.entryPosition = CGRectMake(titleWidth+20,10,totalWidth-titleWidth-20-extra, self.frame.size.height-20);
     }
-
+    
     return _entryElement.parentSection.entryPosition;
 }
 
