@@ -104,7 +104,7 @@
     NSString *selectedValue = nil;
     if (_selected >= 0 && _selected <_items.count)
         selectedValue = [[_items objectAtIndex:(NSUInteger) _selected] description];
-
+    
     if (self.title == NULL){
         cell.textField.text = selectedValue;
         cell.detailTextLabel.text = nil;
@@ -117,7 +117,9 @@
     cell.textField.textAlignment = UITextAlignmentRight;
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     cell.selectionStyle = UITableViewCellSelectionStyleBlue;
+    
     cell.textField.userInteractionEnabled = NO;
+    cell.userInteractionEnabled = self.enabled;
     return cell;
 }
 

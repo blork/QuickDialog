@@ -29,6 +29,8 @@
 @property (nonatomic, strong) NSString *prefix;
 @property (nonatomic, strong) NSString *suffix;
 @property (assign) BOOL hiddenToolbar;
+@property (assign) BOOL enabled;
+
 
 @property(nonatomic, unsafe_unretained) id<QuickDialogEntryElementDelegate> delegate;
 

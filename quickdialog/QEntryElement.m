@@ -32,6 +32,7 @@
         self.returnKeyType = UIReturnKeyDefault;
         self.enablesReturnKeyAutomatically = NO;
         self.secureTextEntry = NO;
+        self.enabled = YES;
     }
     return self;
 }
@@ -53,8 +54,12 @@
         cell = [[QEntryTableViewCell alloc] init];
     }
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    cell.textField.enabled = YES;
-    cell.textField.userInteractionEnabled = YES;
+    
+    cell.textField.enabled = self.enabled;
+    cell.textField.userInteractionEnabled = self.enabled;
+    cell.userInteractionEnabled = self.enabled;
+    cell.textLabel.enabled = self.enabled;
+    
     cell.imageView.image = self.image;
     [cell prepareForElement:self inTableView:tableView];
     return cell;
