@@ -43,7 +43,6 @@
 @property(nonatomic,getter=isSecureTextEntry) BOOL secureTextEntry;       // default is NO
 @property(nonatomic, assign) BOOL clearsOnBeginEditing;                   // default is NO
 
-
 @property(nonatomic, copy) NSString *customDateFormat;
 
 - (QEntryElement *)init;
