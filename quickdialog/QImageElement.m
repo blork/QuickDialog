@@ -23,61 +23,72 @@
 @synthesize detailImage;
 @synthesize detailImageView;
 @synthesize imagePickerController;
+@synthesize placeholder;
 
-- (QImageElement *)initWithTitle:(NSString *)aTitle detailImage:(UIImage *)anImage {
-   self = [super init];
-   if (self) {
-      self.title = aTitle;
-      self.detailImage = anImage;
-   }
-   return self;
+- (QImageElement *)initWithTitle:(NSString *)aTitle andPlaceholderImageNamed:(NSString *)aPlaceholder {
+    self = [super init];
+    if (self) {
+        self.title = aTitle;
+        self.placeholderImage = [UIImage imageNamed:aPlaceholder];
+    }
+    return self;
 }
 
 - (void)setDetailImageNamed:(NSString *)name {
-   self.detailImage = [UIImage imageNamed:name];
+    self.detailImage = [UIImage imageNamed:name];
 }
 
 - (NSString *)detailImageNamed {
-   return nil;
+    return nil;
 }
 
 - (UITableViewCell *)getCellForTableView:(QuickDialogTableView *)tableView controller:(QuickDialogController *)controller {
-   QImageTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"QuickformImageElement"];
-   if (cell==nil){
-      cell = [[QImageTableViewCell alloc] init];
-   }
-   [cell prepareForElement:self inTableView:tableView];
-   
-   return cell;
+    QImageTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"QuickformImageElement"];
+    if (cell==nil){
+        cell = [[QImageTableViewCell alloc] init];
+    }
+    [cell prepareForElement:self inTableView:tableView];
+    
+    return cell;
 }
 
 - (void)selected:(QuickDialogTableView *)tableView controller:(QuickDialogController *)controller indexPath:(NSIndexPath *)path {
-   //[super selected:tableView controller:controller indexPath:path];
-   //[tableView deselectRowAtIndexPath:path animated:YES];
-   
-   self.imagePickerController.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-   [controller displayViewController:self.imagePickerController];
+    //[super selected:tableView controller:controller indexPath:path];
+    //[tableView deselectRowAtIndexPath:path animated:YES];
+    
+    [controller displayViewController:self.imagePickerController];
 }
 
 
 - (UIImagePickerController *)imagePickerController {
-   if (!imagePickerController) {
-      imagePickerController = [[UIImagePickerController alloc] init];
-      imagePickerController.delegate = self;
-   }
-   return imagePickerController;
+    if (!imagePickerController) {
+        imagePickerController = [[UIImagePickerController alloc] init];
+        imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+        imagePickerController.showsCameraControls = YES;
+        imagePickerController.delegate = self;
+    }
+    return imagePickerController;
+}
+
+
+- (void)fetchValueIntoObject:(id)obj {
+	if (_key==nil)
+		return;
+	
+	[obj setValue:detailImage forKey:_key];
 }
 
 #pragma mark -
 #pragma mark UIImagePickerControllerDelegate
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-   self.detailImage = [info valueForKey:UIImagePickerControllerOriginalImage];
-   [self.imagePickerController dismissViewControllerAnimated:YES completion:NULL];
+    self.detailImage = [info valueForKey:UIImagePickerControllerOriginalImage];
+    [self.imagePickerController dismissViewControllerAnimated:YES completion:NULL];
+    self.onValueChanged();
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-   [self.imagePickerController dismissViewControllerAnimated:YES completion:NULL];
+    [self.imagePickerController dismissViewControllerAnimated:YES completion:NULL];
 }
 
 @end
