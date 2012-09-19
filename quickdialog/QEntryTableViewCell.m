@@ -93,7 +93,7 @@
         }
         
         if(titleWidth == 0) {
-            titleWidth = totalWidth*0.6;
+            titleWidth = totalWidth * 0.4;
         }
         
         _entryElement.parentSection.entryPosition = CGRectMake(titleWidth+20,10,totalWidth-titleWidth-20-extra, self.frame.size.height-20);
