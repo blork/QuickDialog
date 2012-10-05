@@ -56,17 +56,27 @@
     //[super selected:tableView controller:controller indexPath:path];
     //[tableView deselectRowAtIndexPath:path animated:YES];
     
-    [controller displayViewController:self.imagePickerController];
+    if (self.imagePickerController) {
+        [controller displayViewController:self.imagePickerController];
+    } else {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
+                                                        message:@"Your device does not have a camera."
+                                                       delegate:self
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+    }
 }
 
 
 - (UIImagePickerController *)imagePickerController {
-    if (!imagePickerController) {
-        imagePickerController = [[UIImagePickerController alloc] init];
-        imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
-        imagePickerController.showsCameraControls = YES;
-        imagePickerController.delegate = self;
-    }
+    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
+	{
+		imagePickerController = [[UIImagePickerController alloc] init];
+		imagePickerController.delegate = self;
+		imagePickerController.allowsEditing = YES;
+		imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+	}
     return imagePickerController;
 }
 
@@ -82,13 +92,13 @@
 #pragma mark UIImagePickerControllerDelegate
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    self.detailImage = [info valueForKey:UIImagePickerControllerOriginalImage];
-    [self.imagePickerController dismissViewControllerAnimated:YES completion:NULL];
+    self.detailImage = [info valueForKey:UIImagePickerControllerEditedImage];
+    [picker dismissViewControllerAnimated:YES completion:nil];
     self.onValueChanged();
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-    [self.imagePickerController dismissViewControllerAnimated:YES completion:NULL];
+    [picker dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end
