@@ -16,12 +16,15 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "QRootElement.h"
+#import "QuickDialog.h"
 
-@interface QImageElement : QEntryElement
+@interface QImageElement : QEntryElement <UIActionSheetDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 
 @property (nonatomic, strong) UIImage *detailImage;
 @property (nonatomic, strong) UIImage *placeholderImage;
 @property (nonatomic, readonly, strong) UIImageView *detailImageView;
+@property (nonatomic, strong) QuickDialogController *presentingController;
+
 @property (nonatomic, assign) NSString *detailImageNamed;
 
 - (QImageElement *)initWithTitle:(NSString *)aTitle andPlaceholderImageNamed:(NSString *)aPlaceholder;

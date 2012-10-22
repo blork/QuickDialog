@@ -14,15 +14,10 @@
 
 #import "QImageElement.h"
 
-@interface QImageElement () <UINavigationControllerDelegate, UIImagePickerControllerDelegate>
-@property (nonatomic, retain) UIImagePickerController *imagePickerController;
-@end
-
 @implementation QImageElement
 
 @synthesize detailImage;
 @synthesize detailImageView;
-@synthesize imagePickerController;
 @synthesize placeholder;
 
 - (QImageElement *)initWithTitle:(NSString *)aTitle andPlaceholderImageNamed:(NSString *)aPlaceholder {
@@ -53,11 +48,50 @@
 }
 
 - (void)selected:(QuickDialogTableView *)tableView controller:(QuickDialogController *)controller indexPath:(NSIndexPath *)path {
-    //[super selected:tableView controller:controller indexPath:path];
-    //[tableView deselectRowAtIndexPath:path animated:YES];
     
-    if (self.imagePickerController) {
-        [controller displayViewController:self.imagePickerController];
+    [super selected:tableView controller:controller indexPath:path];
+    [tableView deselectRowAtIndexPath:path animated:YES];
+    
+    self.presentingController = controller;
+    
+    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]
+        && [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
+        UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take photo", @"Choose from Photo Library", nil];
+        [actionSheet showFromRect:[[tableView cellForRowAtIndexPath:path] frame] inView:tableView animated:YES];
+    } else if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        [self takePhoto];
+    } else {
+        [self choosePhoto];
+    }
+}
+
+
+-(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    switch (buttonIndex) {
+        case 0:
+        {
+            [self takePhoto];
+            break;
+        }
+        case 1:
+        {
+            [self choosePhoto];
+            return;
+        }
+        default:
+            break;
+    }
+}
+
+-(void) takePhoto {
+    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
+        imagePickerController.delegate = self;
+        imagePickerController.allowsEditing = NO;
+        imagePickerController.showsCameraControls = YES;
+        imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+        
+        [self.presentingController presentModalViewController:imagePickerController animated:YES];
     } else {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
                                                         message:@"Your device does not have a camera."
@@ -68,18 +102,23 @@
     }
 }
 
-
-- (UIImagePickerController *)imagePickerController {
-    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
-	{
-		imagePickerController = [[UIImagePickerController alloc] init];
-		imagePickerController.delegate = self;
-		imagePickerController.allowsEditing = YES;
-		imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
-	}
-    return imagePickerController;
+-(void) choosePhoto {
+    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
+        UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
+        imagePickerController.delegate = self;
+        imagePickerController.allowsEditing = NO;
+        imagePickerController.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+        [self.presentingController presentModalViewController:imagePickerController animated:YES];
+        
+    } else {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
+                                                        message:@"Cannot access the photo library."
+                                                       delegate:self
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+    }
 }
-
 
 - (void)fetchValueIntoObject:(id)obj {
 	if (_key==nil)
@@ -92,9 +131,18 @@
 #pragma mark UIImagePickerControllerDelegate
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    self.detailImage = [info valueForKey:UIImagePickerControllerEditedImage];
+    if ([info valueForKey:UIImagePickerControllerEditedImage]) {
+        self.detailImage = [info valueForKey:UIImagePickerControllerEditedImage];
+    } else {
+        self.detailImage = [info valueForKey:UIImagePickerControllerOriginalImage];
+    }
+    
+    [self.detailImageView setImage:self.detailImage];
+    [self.presentingController.quickDialogTableView reloadData];
     [picker dismissViewControllerAnimated:YES completion:nil];
-    self.onValueChanged();
+    if (self.onValueChanged) {
+        self.onValueChanged();
+    }
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
