@@ -40,6 +40,7 @@
         _textView = [[UITextView alloc] init];
         _textView.delegate = self;
         _textView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+        _textView.font = [UIFont systemFontOfSize:18.0f];
     }
     return self;
 }
